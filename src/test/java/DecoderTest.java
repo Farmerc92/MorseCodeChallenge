@@ -53,4 +53,9 @@ public class DecoderTest {
         Assert.assertEquals(decoded, Decoder.decode(encoded));
     }
 
+    @Test
+    public void teststuff(){
+        Assert.assertEquals("FARAWAY LAUNDRY", Decoder.decode("XOXOXXXOXOOOXOXXXOOOXOXXXOXOOOXOXXXOOOXOXXXOXXXOOOXOXXXOOOXXXOXOXXXOXXXOOOOOOOXOXXXOXOXOOOXOXXXOOOXOXOXXXOOOXXXOXOOOXXXOXOXOOOXOXXXOXOOOXXXOXOXXXOXXXOOO"));
+    }
+
 }

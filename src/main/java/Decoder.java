@@ -37,37 +37,63 @@ public class Decoder {
         char dah = findDah(dit, chars);
         int dahCount = 0;
         int ditCount = 0;
+        int multiple = findMultiple(dah, dit, chars);
         for (char c : chars) {
             if (c == dit) {
-                if (dahCount == 3){
+                if (dahCount == 3 * multiple){
                     output += decoderMap.get(currentChar);
                     currentChar = "";
                 }
-                if (dahCount == 7){
+                if (dahCount == 7 * multiple){
+                    output += decoderMap.get(currentChar);
+                    currentChar = "";
                     output += " ";
                 }
                 dahCount = 0;
                 ditCount++;
             }
             else if (c == dah){
-                if (ditCount == 1 && dahCount < 1){
+                if (ditCount == multiple && dahCount < multiple){
                     currentChar += ".";
                 }
-                else if (ditCount == 3 && dahCount < 1) {
+                else if (ditCount == 3 * multiple && dahCount < multiple) {
                     currentChar += "-";
                 }
                 ditCount = 0;
                 dahCount++;
             }
         }
-        if (ditCount == 1){
+        if (ditCount == multiple){
             currentChar += ".";
         }
-        else if (ditCount == 3){
+        else if (ditCount == 3 * multiple){
             currentChar += "-";
         }
         output += decoderMap.get(currentChar);
         return output;
+    }
+
+    private static int findMultiple(char dah, char dit, char[] chars) {
+        int dahCount = 0;
+        int ditCount = 0;
+        int min = Integer.MAX_VALUE;
+        for(char c : chars){
+            if (c == dah){
+                dahCount++;
+                if (ditCount != 0 && ditCount < min){
+                    min = ditCount;
+                }
+                ditCount=0;
+            }
+            else {
+                ditCount++;
+                if (dahCount != 0 && dahCount < min){
+                    min = dahCount;
+                }
+                dahCount = 0;
+            }
+        }
+        return min;
     }
 
     public static char findDah(char dit, char[] chars){
