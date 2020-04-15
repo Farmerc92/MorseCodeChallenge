@@ -98,7 +98,7 @@ public class Decoder {
                     output[i] = chars[i + 1];
                 }
                 else {
-                    output[i] = chars[i - 1];
+                    output[i] = output[i - 1];
                 }
             }
             else {
@@ -187,7 +187,6 @@ public class Decoder {
                 spaceCount = 0;
             }
         }
-        System.out.println(min);
         return min;
     }
 }
