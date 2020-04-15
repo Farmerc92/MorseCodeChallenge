@@ -39,14 +39,16 @@ public class Decoder {
         char space = twoMostCommon[1];
         int spaceCount = 0;
         int ditCount = 0;
-        int multiple = findMultiple(space, dit, chars);
         space = findSpace(chars, space, dit);
         if (space == dit){
             dit = twoMostCommon[1];
         }
+        String removedNoise = encoded.replaceAll("[^" + dit + space + "]", "");
+        chars = removedNoise.toCharArray();
+        int multiple = findMultiple(space, dit, chars);
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == dit) {
-                if (spaceCount == 3 * multiple){
+                if (spaceCount == 3 * multiple || spaceCount == 7 * multiple){
                     if (decoderMap.get(currentChar) == null){
                         spaceCount = 0;
                         ditCount = 0;
@@ -62,19 +64,6 @@ public class Decoder {
                     currentChar = "";
                 }
                 if (spaceCount == 7 * multiple){
-                    if (decoderMap.get(currentChar) == null){
-                        spaceCount = 0;
-                        ditCount = 0;
-                        char temp = space;
-                        space = dit;
-                        dit = temp;
-                        i = -1;
-                        output = "";
-                        currentChar = "";
-                        continue;
-                    }
-                    output += decoderMap.get(currentChar);
-                    currentChar = "";
                     output += " ";
                 }
                 spaceCount = 0;
