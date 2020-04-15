@@ -43,9 +43,8 @@ public class Decoder {
         if (space == dit){
             dit = twoMostCommon[1];
         }
-        String removedNoise = encoded.replaceAll("[^" + dit + space + "]", "");
-        chars = removedNoise.toCharArray();
-        int multiple = findMultiple(space, dit, chars);
+        chars = fixedNoise(chars, space, dit);
+        int multiple = findMultiple(space, chars);
         for (int i = 0; i < chars.length; i++) {
             if (chars[i] == dit) {
                 if (spaceCount == 3 * multiple || spaceCount == 7 * multiple){
@@ -64,7 +63,8 @@ public class Decoder {
                     currentChar = "";
                 }
                 if (spaceCount == 7 * multiple){
-                    output += " ";
+                    if (!output.equals(""))
+                        output += " ";
                 }
                 spaceCount = 0;
                 ditCount++;
@@ -87,6 +87,24 @@ public class Decoder {
             currentChar += "-";
         }
         output += decoderMap.get(currentChar);
+        return output;
+    }
+
+    private static char[] fixedNoise(char[] chars, char space, char dit) {
+        char[] output = new char[chars.length];
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] != space && chars[i] != dit){
+                if (i == 0){
+                    output[i] = chars[i + 1];
+                }
+                else {
+                    output[i] = chars[i - 1];
+                }
+            }
+            else {
+                output[i] = chars[i];
+            }
+        }
         return output;
     }
 
@@ -149,7 +167,7 @@ public class Decoder {
         return output;
     }
 
-    private static int findMultiple(char space, char dit, char[] chars) {
+    private static int findMultiple(char space, char[] chars) {
         int spaceCount = 0;
         int ditCount = 0;
         int min = Integer.MAX_VALUE;
@@ -169,6 +187,7 @@ public class Decoder {
                 spaceCount = 0;
             }
         }
+        System.out.println(min);
         return min;
     }
 }
