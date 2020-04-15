@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,34 +34,61 @@ public class Decoder {
         String output = "";
         String currentChar = "";
         char[] chars = encoded.toCharArray();
-        char dit = chars[0];
-        char dah = findDah(dit, chars);
-        int dahCount = 0;
+        char[] twoMostCommon = findTwoMostCommon(chars);
+        char dit = twoMostCommon[0];
+        char space = twoMostCommon[1];
+        int spaceCount = 0;
         int ditCount = 0;
-        int multiple = findMultiple(dah, dit, chars);
-        for (char c : chars) {
-            if (c == dit) {
-                if (dahCount == 3 * multiple){
+        int multiple = findMultiple(space, dit, chars);
+        space = findSpace(chars, space, dit);
+        if (space == dit){
+            dit = twoMostCommon[1];
+        }
+        for (int i = 0; i < chars.length; i++) {
+            if (chars[i] == dit) {
+                if (spaceCount == 3 * multiple){
+                    if (decoderMap.get(currentChar) == null){
+                        spaceCount = 0;
+                        ditCount = 0;
+                        char temp = space;
+                        space = dit;
+                        dit = temp;
+                        i = -1;
+                        output = "";
+                        currentChar = "";
+                        continue;
+                    }
                     output += decoderMap.get(currentChar);
                     currentChar = "";
                 }
-                if (dahCount == 7 * multiple){
+                if (spaceCount == 7 * multiple){
+                    if (decoderMap.get(currentChar) == null){
+                        spaceCount = 0;
+                        ditCount = 0;
+                        char temp = space;
+                        space = dit;
+                        dit = temp;
+                        i = -1;
+                        output = "";
+                        currentChar = "";
+                        continue;
+                    }
                     output += decoderMap.get(currentChar);
                     currentChar = "";
                     output += " ";
                 }
-                dahCount = 0;
+                spaceCount = 0;
                 ditCount++;
             }
-            else if (c == dah){
-                if (ditCount == multiple && dahCount < multiple){
+            else if (chars[i] == space){
+                if (ditCount == multiple && spaceCount < multiple){
                     currentChar += ".";
                 }
-                else if (ditCount == 3 * multiple && dahCount < multiple) {
+                else if (ditCount == 3 * multiple && spaceCount < multiple) {
                     currentChar += "-";
                 }
                 ditCount = 0;
-                dahCount++;
+                spaceCount++;
             }
         }
         if (ditCount == multiple){
@@ -73,13 +101,72 @@ public class Decoder {
         return output;
     }
 
-    private static int findMultiple(char dah, char dit, char[] chars) {
-        int dahCount = 0;
+    private static char findSpace(char[] chars, char space, char dit) {
+        int spaceCount = 0;
+        int ditCount = 0;
+        int max = 0;
+        char maxC = ' ';
+        for(char c : chars){
+            if (c == space){
+                spaceCount++;
+                if (ditCount >= max){
+                    maxC = dit;
+                    max = ditCount;
+                }
+                ditCount = 0;
+            }
+            else if (c == dit){
+                ditCount++;
+                if (spaceCount >= max){
+                    maxC = space;
+                    max = spaceCount;
+                }
+                spaceCount = 0;
+            }
+        }
+        if (spaceCount >= max){
+            return space;
+        }
+        if (ditCount >= max){
+            return dit;
+        }
+        return maxC;
+    }
+
+    private static char[] findTwoMostCommon(char[] chars) {
+        HashMap<Character, Integer> map = new HashMap<>();
+        for (char c : chars) {
+            map.put(c, map.getOrDefault(c, 0) + 1);
+        }
+        char[] output = new char[2];
+        int max = 0;
+        char maxC = ' ';
+        for(Map.Entry<Character, Integer> entry : map.entrySet()){
+            if (entry.getValue() > max){
+                maxC = entry.getKey();
+                max = entry.getValue();
+            }
+        }
+        max = 0;
+        output[0] = maxC;
+        map.remove(maxC);
+        for(Map.Entry<Character, Integer> entry : map.entrySet()){
+            if (entry.getValue() > max){
+                maxC = entry.getKey();
+                max = entry.getValue();
+            }
+        }
+        output[1] = maxC;
+        return output;
+    }
+
+    private static int findMultiple(char space, char dit, char[] chars) {
+        int spaceCount = 0;
         int ditCount = 0;
         int min = Integer.MAX_VALUE;
         for(char c : chars){
-            if (c == dah){
-                dahCount++;
+            if (c == space){
+                spaceCount++;
                 if (ditCount != 0 && ditCount < min){
                     min = ditCount;
                 }
@@ -87,23 +174,12 @@ public class Decoder {
             }
             else {
                 ditCount++;
-                if (dahCount != 0 && dahCount < min){
-                    min = dahCount;
+                if (spaceCount != 0 && spaceCount < min){
+                    min = spaceCount;
                 }
-                dahCount = 0;
+                spaceCount = 0;
             }
         }
         return min;
-    }
-
-    public static char findDah(char dit, char[] chars){
-        char dah = ' ';
-        for (char c : chars) {
-            if (c != dit) {
-                dah = c;
-                break;
-            }
-        }
-        return dah;
     }
 }
