@@ -1,14 +1,13 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class Decoder {
 
     //Compile pattern here for efficiency.  And use to check for non alphanumeric characters in the encoded string.
-    private static Pattern pattern = Pattern.compile("^[A-Z0-9]*$");
+    private static final Pattern pattern = Pattern.compile("^[A-Z0-9]*$");
     //Initialize my decoder map so I can fill it.
-    private static HashMap<String, String> decoderMap = new HashMap<>();
-    //Fill my decoder map with (key: morde code , value: string representation of the character) pairs.
+    private static final HashMap<String, String> decoderMap = new HashMap<>();
+    //Fill my decoder map with (key: morse code , value: string representation of the character) pairs.
     static{
         decoderMap.put(".-", "A");   decoderMap.put("-...", "B");  decoderMap.put("-.-.", "C");
         decoderMap.put("-..", "D");  decoderMap.put(".", "E");     decoderMap.put("..-.", "F");

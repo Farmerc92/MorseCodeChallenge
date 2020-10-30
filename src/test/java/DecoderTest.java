@@ -53,5 +53,4 @@ public class DecoderTest {
         Assert.assertEquals(decoded, Decoder.decode(encoded));
     }
 
-
 }
